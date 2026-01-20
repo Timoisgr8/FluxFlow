@@ -1,0 +1,54 @@
+/* React Grid Layout resize handle styling */
+.react-grid-layout .react-resizable-handle {
+  background: none !important;
+}
+
+.react-grid-layout .react-resizable-handle::after {
+  content: "";
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  border-left: 0;
+  border-top: 0;
+  border-radius: 0 0 4px 0;
+  box-sizing: border-box;
+}
+
+/* Prevent text selection during resize/drag operations */
+.grid-resizing * {
+  user-select: none !important;
+}
+
+/* Updated CSS - exclude buttons with grid-safe-button class */
+.grid-resizing button:not(.grid-safe-button) {
+  pointer-events: none !important;
+}
+
+/* Selectively disable pointer events only on problematic elements */
+.grid-resizing iframe,
+.grid-resizing embed,
+.grid-resizing object,
+.grid-resizing input,
+.grid-resizing textarea,
+.grid-resizing select,
+.grid-resizing a,
+.grid-resizing canvas {
+  pointer-events: none !important;
+}
+
+.react-grid-item:focus {
+  outline: none;
+}
+
+/* In DashboardGrid.css */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.panel-fade {
+  animation: fadeIn 0.3s ease-in-out;
+}

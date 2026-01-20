@@ -1,0 +1,93 @@
+services:
+  backend:
+    build: ./backend
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000" # Make sure to edit the Expose value in ./backend/Dockerfile if you change this
+      - "3002:3002"
+    environment:
+      - NODE_ENV=development
+      - USE_REDIS=${REDIS:-true} # true / false
+      - REDIS_URL=redis://redis:6379
+      - SESSION_SECRET=super-secret-key # or pass from a secret manager in prod
+    command: npm run dev
+
+    networks:
+      - app_net
+
+  frontend:
+    build: ./frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    platform: linux/amd64
+    ports:
+      - "5173:5173" # Make sure to edit the Expose value in ./backend/Dockerfile if you change this
+    environment:
+      - NODE_ENV=development                    # can be production / development. production will remove devtools. 
+    command: npm run dev
+
+    networks:
+      - app_net
+
+  grafana:
+    image: grafana/grafana:9.5.3
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/config/grafana.ini:/etc/grafana/grafana.ini
+    depends_on:
+      - influxdb
+    networks:
+      - app_net
+
+  influxdb:
+    image: influxdb:2.7
+    container_name: influxdb
+    ports:
+      - "8086:8086"
+    environment:
+      # If these environment variables are alters you must also change influxdb.yaml to reflect the changes aswell
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=myuser
+      - DOCKER_INFLUXDB_INIT_PASSWORD=mypassword
+      - DOCKER_INFLUXDB_INIT_ORG=myorg
+      - DOCKER_INFLUXDB_INIT_BUCKET=mybucket
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=mytoken
+    networks:
+      - app_net
+    volumes:
+      - influxdb-storage:/var/lib/influxdb2
+
+  # Redis is used for Session ID Storage
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - app_net
+
+  # Telegraf is to produce dummy timeseries data
+  telegraf:
+    image: telegraf:latest
+    container_name: telegraf
+    depends_on:
+      - influxdb
+    volumes:
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    networks:
+      - app_net
+
+networks:
+  app_net:
+    driver: bridge
+
+volumes:
+  grafana-storage:
+  influxdb-storage:

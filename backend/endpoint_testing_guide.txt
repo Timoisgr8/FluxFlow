@@ -1,0 +1,41 @@
+Login Guide using Isomnia/Postman
+Request formatting:
+    - Method: POST
+    - URL: http://localhost:3000/auth/login
+    - Body JSON: 
+        {
+        "username": "admin",
+        "password": "admin"
+        }
+
+On success should return
+    200 OK:
+    {
+        "message": "Logged in to Grafana successfully"
+    }
+
+
+
+Get User Data
+Request formatting:
+    - Method: Get
+    - URL: http://localhost:3000/grafana/user-data
+
+On success should return
+    200 OK:
+    {
+        "id": 1,
+        "email": "admin@localhost",
+        "name": "",
+        "login": "admin",
+        "theme": "",
+        "orgId": 1,
+        "isGrafanaAdmin": true,
+        "isDisabled": false,
+        "isExternal": false,
+        "isExternallySynced": false,
+        "authLabels": [],
+        "updatedAt": "2025-09-02T14:52:11Z",
+        "createdAt": "2025-09-02T14:52:11Z",
+        "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56"
+    }
